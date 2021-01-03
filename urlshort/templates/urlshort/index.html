@@ -1,0 +1,164 @@
+{% load static %}
+
+<style>
+    body{
+        background-color: #5e5ea5;
+    }
+    *{
+        margin:0;
+        padding:0;
+        font-family: sans-serif;
+    }
+    .error{
+        color: #fd4c4c;
+        font-size: 11px;
+        font-weight: bold;
+        font-family: monospace;
+        padding: 5px;
+    }
+    .form{
+        margin-top: 100px;
+        padding: 15px;
+        display: flex;
+        flex-direction:column;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+    .form_inner{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    input[type=text]{
+        border: none;
+        background: #211f7d;
+        border-radius: 20px;
+        padding: 10px;
+        margin: 5px;
+        color:#fff;
+        outline: none;
+    }
+    button{
+        border: none;
+        color: #fff;
+        background: #181769;
+        border-radius: 20px;
+        outline: none;
+        padding: 10px 10px;
+        font-weight: bold;
+
+    }
+    .container{
+        margin-top: 40px;
+        padding: 50px 15px;
+           background: #454596;
+        border-radius: 6px;
+    }
+    .ani{
+       background: #55559e;
+        border-radius: 20px;
+       padding: 5px 5px 5px 7px;
+        margin-top: 5;
+        font-size: 15px;
+        font-weight: bold;
+        
+        opacity: 0;
+        color: #dedee6;
+        transform: translateY(20px);
+        animation-name: slideUp;
+        animation-fill-mode: forwards;
+        animation-duration: .9s;
+    }
+    .intro{
+        padding: 7px;
+        max-width: 350px;
+        line-height: 1.5;
+       color: #fff;
+        opacity: .9;
+        text-align:center;
+        
+    }
+    @keyframes slideUp {
+        0%{
+            
+        }
+        100%{
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media screen and (max-width: 743px) {
+        .intro{
+            text-align: center;
+        }
+    }
+</style>
+
+
+<div class="form">
+    <h1 class="intro">Reduce long Url's into clean, sharable urls</h1>
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            <div class="msg"><p></p></div>
+            <div class="form_inner">
+                <input name="url" class="inputurl" type="text" >
+                <button type="submit"  class="submit">Shorten</button>
+
+            </div>
+            
+            <div class="result"><p></p></div>
+        </form>
+    </div>
+    
+</div>
+
+<script src="{% static 'urlshort/js/jquery-3.5.1.min.js'%}"></script>
+
+<script>
+    $(document).ready(function(){
+
+        $('form').submit(function(e){
+            e.preventDefault();
+        });
+
+        $('.submit').click(function(){
+            if($('.inputurl').val() === ''){return alert("empty")}
+            let $url = $('.inputurl').val();
+
+            $.ajax({    
+                type: 'POST',
+                url: 'shorten/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    url: $url
+                },
+                success: function(response){
+                    if(response.old){
+                        console.log(response)
+                        $('.msg p').replaceWith('<p class="error">This Url Already Exist</p>')
+                        $('.result p').replaceWith('<p class="ani">'+response.old+'</p>')
+                        return true
+                    }
+                    else if(response.new){
+                        console.log('new'+ response.new)
+                        $('.msg p').replaceWith('<p></p>')
+                        $('.result p').replaceWith('<p class="ani"> Short Url: '+response.new+'</p>')
+                        return true
+                    }
+                },
+                error: function(response){
+                    alert('error')
+                }
+            });
+        
+        })
+
+
+        
+
+    })
+    
+
+</script>
