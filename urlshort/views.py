@@ -9,8 +9,6 @@ from urlshort.models import UrlData
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
-
-
 # Create your views here.
 
 def main(request):
